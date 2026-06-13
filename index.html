@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Operative Obstetric Anesthesia & Analgesia | MCN Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .transition-all { transition: all 0.3s ease; }
+        .recall-mode .reveal-text {
+            background-color: #cbd5e1;
+            color: transparent;
+            border-radius: 0.375rem;
+            padding: 0 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: inset 0 0 0 1px #94a3b8;
+        }
+        .recall-mode .reveal-text:hover,
+        .recall-mode .reveal-text.revealed {
+            background-color: #fecdd3;
+            color: #1e293b;
+            box-shadow: none;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #be123c; border-radius: 8px; }
+        .content-section { animation: fade 0.3s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .quiz-feedback-correct { background-color: #dcfce7; border-left: 4px solid #22c55e; }
+        .quiz-feedback-wrong { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+        .locked-section { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { obanes: { light: '#fef2f2', DEFAULT: '#be123c', dark: '#881337' } } } }
+        }
+    </script>
+</head>
+<body class="bg-slate-100 h-screen flex flex-col md:flex-row font-sans text-slate-800 overflow-hidden">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-obanes-dark text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+        <button onclick="toggleMobileMenu()" class="text-white focus:outline-none z-40">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+        <h1 class="font-bold text-lg absolute left-1/2 transform -translate-x-1/2 pointer-events-none">
+            <i class="fa-solid fa-syringe mr-2"></i> Obstetric Anesthesia
+        </h1>
+        <div class="w-8"></div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-80 bg-white shadow-2xl h-full absolute md:relative z-30 transition-transform duration-300 shrink-0 border-r border-slate-200">
+        <div class="p-6 bg-gradient-to-br from-obanes-dark to-obanes text-white hidden md:block shrink-0">
+            <h1 class="font-black text-2xl tracking-wide"><i class="fa-solid fa-hand-holding-medical mr-2"></i> Obstetric Analgesia/Anesthesia</h1>
+            <p class="text-sm text-rose-200 mt-1 font-medium">Pain Management in Labor & Delivery | Pillitteri</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 text-sm font-medium">
+                <li><button onclick="showSection('home')" id="btn-home" class="nav-btn w-full text-left px-6 py-3 bg-obanes-light text-obanes-dark border-r-4 border-obanes-dark transition-colors"><i class="fa-solid fa-house w-6 nav-icon"></i><i class="fa-solid fa-lock w-6 hidden"></i> Home / Start</button></li>
+                <li><button onclick="showSection('overview')" id="btn-overview" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-book-open w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Overview & Principles</button></li>
+                <li><button onclick="showSection('systemic')" id="btn-systemic" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-capsules w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Systemic Analgesia (Opioids)</button></li>
+                <li><button onclick="showSection('regional')" id="btn-regional" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-spine w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Regional Anesthesia (Epidural, Spinal)</button></li>
+                <li><button onclick="showSection('local')" id="btn-local" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-syringe w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Local & Pudendal Block</button></li>
+                <li><button onclick="showSection('general')" id="btn-general" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-lungs w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> General Anesthesia & Indications</button></li>
+                <li><button onclick="showSection('complications')" id="btn-complications" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-skull-crossbones w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Complications & Nursing Care</button></li>
+                <li><button onclick="showSection('mnemonics')" id="btn-mnemonics" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors border-t border-slate-200 mt-2 locked-section"><i class="fa-solid fa-brain w-6 text-obanes nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Mnemonics & Summary</button></li>
+                <li><button onclick="showSection('final_quiz_sec')" id="btn-final_quiz_sec" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-graduation-cap w-6 text-amber-500 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Final 50‑Item Exam</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 h-full overflow-y-auto bg-slate-100 relative w-full">
+        <div class="fixed top-16 md:top-4 right-4 md:right-8 z-40 flex items-center bg-white/90 backdrop-blur px-4 py-3 rounded-full shadow-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors" onclick="toggleRecallMode()">
+            <span class="mr-3 text-sm font-bold text-slate-700 hidden md:inline"><i class="fa-solid fa-brain text-obanes mr-1"></i> Active Recall</span>
+            <button id="recall-toggle" class="w-12 h-6 bg-slate-300 rounded-full relative transition-colors duration-300 focus:outline-none shadow-inner pointer-events-none">
+                <div id="recall-knob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow"></div>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-8 max-w-6xl mx-auto pb-32">
+            <!-- HOME SECTION -->
+            <section id="home" class="content-section flex flex-col items-center justify-center min-h-[80vh] text-center block">
+                <div class="bg-gradient-to-br from-slate-800 to-obanes-dark text-white rounded-3xl shadow-2xl p-10 md:p-16 w-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white opacity-5 pointer-events-none"><i class="fa-solid fa-syringe text-[20rem]"></i></div>
+                    <div class="relative z-10">
+                        <div class="bg-white/10 backdrop-blur-sm inline-block p-4 rounded-full text-rose-300 mb-6 shadow-sm border border-white/20">
+                            <i class="fa-solid fa-hand-holding-medical text-5xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-300 mb-2 uppercase tracking-widest">Maternal & Child Health Nursing</h3>
+                        <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight drop-shadow-md">Operative Obstetric<br>Analgesia & Anesthesia</h1>
+                        <div class="bg-white/10 backdrop-blur inline-block px-6 py-3 rounded-full mb-10 border border-white/20">
+                            <p class="text-lg text-white font-medium">Pain Relief in Labor & Delivery | <strong>Adele Pillitteri, 7e</strong></p>
+                        </div>
+                        <button onclick="unlockFirstSection()" class="bg-slate-600 hover:bg-slate-500 text-white font-black py-4 px-10 rounded-full shadow-xl transition-transform hover:scale-105 text-lg flex items-center mx-auto focus:outline-none">
+                            Begin Module <i class="fa-solid fa-arrow-right ml-3"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 1. OVERVIEW & PRINCIPLES -->
+            <section id="overview" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-obanes pb-3"><i class="fa-solid fa-book-open text-obanes mr-4"></i> Overview & Principles</h2>
+                    <p><strong>Operative obstetric analgesia/anesthesia</strong> encompasses methods to relieve pain during labor, operative vaginal delivery, and cesarean section. Goal: <span class="reveal-text">maternal comfort, safety, minimal fetal depression, and maintenance of labor progress.</span></p>
+                    <div class="grid md:grid-cols-2 gap-5 mt-4">
+                        <div class="bg-slate-50 p-4 rounded-xl"><strong>📌 General Principles</strong><br><span class="reveal-text">Pain is subjective; analgesia should be tailored. Most medications cross placenta → monitor fetal heart rate. Avoid aspirin (bleeding risk).</span></div>
+                        <div class="bg-slate-50 p-4 rounded-xl"><strong>🎯 Types</strong><br><span class="reveal-text">Systemic (opioids, sedatives), Regional (epidural, spinal, combined), Local (pudendal, perineal infiltration), General anesthesia.</span></div>
+                    </div>
+                    <div class="bg-obanes-light p-3 rounded-lg mt-4"><i class="fa-regular fa-lightbulb"></i> <strong>Key concept:</strong> Epidural analgesia is the most effective method for labor pain, but requires IV access, fluid bolus, and continuous monitoring.</div>
+                    <button onclick="openQuiz('overview')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 2. SYSTEMIC ANALGESIA (OPIOIDS) -->
+            <section id="systemic" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-obanes pb-3"><i class="fa-solid fa-capsules text-obanes mr-4"></i> Systemic Analgesia (Opioids)</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Common opioids:</strong> <span class="reveal-text">Meperidine (Demerol), Fentanyl, Morphine, Nalbuphine (Nubain), Butorphanol (Stadol).</span></li>
+                        <li><strong>Route:</strong> <span class="reveal-text">IV (preferred for rapid onset) or IM. Onset: IM 30-45 min; IV 5-10 min.</span></li>
+                        <li><strong>Fetal effects:</strong> <span class="reveal-text">Respiratory depression, decreased variability, reduced beat-to-beat variability. Give at least 1-3 hours before delivery to minimize neonatal depression.</span></li>
+                        <li><strong>Nursing interventions:</strong> <span class="reveal-text">Monitor respiratory rate, sedation level, FHR. Keep naloxone (Narcan) available for neonatal resuscitation.</span></li>
+                        <li><strong>Narcotic antagonists:</strong> <span class="reveal-text">Naloxone (0.01 mg/kg IM/IV/ET) reverses respiratory depression in newborn.</span></li>
+                    </ul>
+                    <div class="bg-amber-50 p-3 rounded-lg mt-4"><strong>⚠️ Caution:</strong> <span class="reveal-text">IV opioids can cause maternal hypotension, nausea, vomiting, and pruritus. PCA allows self‑administration with safety limits.</span></div>
+                    <button onclick="openQuiz('systemic')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 3. REGIONAL ANESTHESIA (EPIDURAL, SPINAL) -->
+            <section id="regional" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-obanes pb-3"><i class="fa-solid fa-spine text-obanes mr-4"></i> Regional Anesthesia (Epidural & Spinal)</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div><strong>🔹 Epidural Anesthesia</strong><br><span class="reveal-text">Most common for labor. Catheter placed in epidural space (L3-L4). Provides continuous pain relief. Local anesthetic (bupivacaine, ropivacaine) + opioid (fentanyl). Onset 10-20 min. Advantages: titratable, patient‑controlled (PCEA).</span></div>
+                        <div><strong>🔸 Spinal Anesthesia</strong><br><span class="reveal-text">Single injection into subarachnoid space (L4-L5). Rapid onset (2-5 min), dense motor block. Used for cesarean section or operative vaginal delivery. Avoid for prolonged labor due to short duration.</span></div>
+                        <div><strong>🔹 Combined Spinal‑Epidural (CSE)</strong><br><span class="reveal-text">Fast onset of spinal with ability to extend via epidural catheter. Ideal for early labor then prolonged.</span></div>
+                        <div><strong>📋 Nursing care:</strong> <span class="reveal-text">Pre‑procedure: IV fluid bolus (500-1000 mL LR), baseline vitals, fetal monitoring, informed consent. Post‑procedure: monitor BP every 5-15 min, assess sensory/motor level, bladder distension, pruritus, nausea.</span></div>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-lg mt-4"><strong>🚨 Complications:</strong> <span class="reveal-text">Hypotension (most common), post‑dural puncture headache (spinal), urinary retention, pruritus (opioids), fever, rarely epidural hematoma or abscess.</span></div>
+                    <button onclick="openQuiz('regional')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 4. LOCAL & PUDENDAL BLOCK -->
+            <section id="local" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-obanes pb-3"><i class="fa-solid fa-syringe text-obanes mr-4"></i> Local Infiltration & Pudendal Block</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Local infiltration:</strong> <span class="reveal-text">Lidocaine (1%) injected into perineal area for episiotomy or laceration repair. Onset immediate, short duration.</span></li>
+                        <li><strong>Pudendal nerve block:</strong> <span class="reveal-text">Injected at ischial spine to anesthetize perineum, vulva, lower vagina (spares uterus). Indicated for second stage, low forceps, vacuum, or episiotomy. Onset 5-10 min, duration ~1 hour.</span></li>
+                        <li><strong>Nursing considerations:</strong> <span class="reveal-text">Monitor for local anesthetic toxicity (drowsiness, metallic taste, seizures). Avoid intravascular injection.</span></li>
+                        <li><strong>Advantages:</strong> <span class="reveal-text">No maternal hypotension, no motor block of legs, minimal fetal effect.</span></li>
+                    </ul>
+                    <div class="bg-blue-50 p-3 rounded-lg mt-4"><i class="fa-regular fa-lightbulb"></i> <strong>Clinical pearl:</strong> Pudendal block does not relieve pain from uterine contractions – only for delivery and repair.</div>
+                    <button onclick="openQuiz('local')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 5. GENERAL ANESTHESIA & INDICATIONS -->
+            <section id="general" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-obanes pb-3"><i class="fa-solid fa-lungs text-obanes mr-4"></i> General Anesthesia & Indications</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Indications:</strong> <span class="reveal-text">Emergency cesarean (fetal distress, uterine rupture, massive hemorrhage), contraindication to regional (coagulopathy, sepsis, patient refusal), failed regional, maternal cardiac disease, need for rapid delivery.</span></li>
+                        <li><strong>Technique:</strong> <span class="reveal-text">Rapid sequence induction (cricoid pressure) to prevent aspiration. Agents: thiopental, propofol, ketamine. Succinylcholine for paralysis. Maintenance with volatile anesthetics (sevoflurane, isoflurane).</span></li>
+                        <li><strong>Risks:</strong> <span class="reveal-text">Maternal: aspiration (Mendelson’s syndrome), failed intubation, uterine atony, awareness, malignant hyperthermia. Fetal: neonatal depression (crosses placenta), reduced Apgar scores.</span></li>
+                        <li><strong>Nursing role:</strong> <span class="reveal-text">Pre‑oxygenation, left uterine displacement, aspiration precautions, assist with intubation, monitor neonatal resuscitation readiness.</span></li>
+                    </ul>
+                    <div class="bg-amber-50 p-3 rounded-lg mt-4"><strong>⚠️ Mendelson’s syndrome:</strong> <span class="reveal-text">Aspiration of gastric contents → chemical pneumonitis. Prevention: non‑particulate antacids, H2 blockers, rapid sequence induction.</span></div>
+                    <button onclick="openQuiz('general')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 6. COMPLICATIONS & NURSING CARE -->
+            <section id="complications" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-obanes pb-3"><i class="fa-solid fa-skull-crossbones text-obanes mr-4"></i> Complications & Nursing Care</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div><strong>🩸 Hypotension (epidural/spinal)</strong><br><span class="reveal-text">Mechanism: sympathetic blockade → vasodilation. Prevention: IV fluid bolus, left lateral tilt. Treatment: reposition, fluids, ephedrine (5-10 mg IV) or phenylephrine.</span></div>
+                        <div><strong>🤕 Post‑dural puncture headache (PDPH)</strong><br><span class="reveal-text">Caused by CSF leak after spinal or accidental dural puncture. Worse upright, relieved supine. Treatment: hydration, caffeine, blood patch (epidural).</span></div>
+                        <div><strong>🩺 Urinary retention</strong><br><span class="reveal-text">Frequent with epidural due to sacral nerve block. Need indwelling catheter or intermittent straight cath.</span></div>
+                        <div><strong>🌡️ Fever (epidural)</strong><br><span class="reveal-text">Non‑infectious hyperthermia; rule out chorioamnionitis.</span></div>
+                        <div><strong>🧴 Local anesthetic toxicity</strong><br><span class="reveal-text">Signs: perioral numbness, metallic taste, tinnitus, seizures, cardiac arrest. Treat: lipid emulsion (Intralipid).</span></div>
+                        <div><strong>🧠 High/total spinal</strong><br><span class="reveal-text">Spread of spinal anesthetic to upper thoracic/cervical → apnea, hypotension, bradycardia. Emergency: airway management, vasopressors, CPR.</span></div>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-lg mt-4"><strong>🚨 Nursing priority:</strong> <span class="reveal-text">Monitor BP and respiratory status every 5-15 minutes after neuraxial block; treat hypotension immediately to preserve placental perfusion.</span></div>
+                    <button onclick="openQuiz('complications')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 7. MNEMONICS & SUMMARY -->
+            <section id="mnemonics" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-obanes pb-3"><i class="fa-solid fa-brain text-obanes mr-4"></i> Mnemonics & Summary</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div class="bg-rose-50 p-4 rounded-xl"><strong>📌 “E.S.P.” – Regional types</strong><br><span class="reveal-text">Epidural, Spinal, Pudendal.</span></div>
+                        <div class="bg-rose-50 p-4 rounded-xl"><strong>💊 Opioid reversal</strong><br><span class="reveal-text">Naloxone (Narcan) – dose 0.01 mg/kg in newborn.</span></div>
+                        <div class="bg-rose-50 p-4 rounded-xl"><strong>🩸 Hypotension management mnemonic “F.O.R.M.”</strong><br><span class="reveal-text">Fluids, Oxygen, Reposition (left tilt), Medications (ephedrine/phenylephrine).</span></div>
+                        <div class="bg-rose-50 p-4 rounded-xl"><strong>⚠️ Contraindications to regional</strong><br><span class="reveal-text">Patient refusal, coagulopathy, infection at site, hypovolemia, increased ICP, sepsis.</span></div>
+                        <div class="bg-rose-50 p-4 rounded-xl"><strong>📊 CSE → Combined Spinal‑Epidural</strong><br><span class="reveal-text">Fast onset + continuous extension.</span></div>
+                        <div class="bg-rose-50 p-4 rounded-xl"><strong>🧪 Local anesthetic toxicity “L.A.T.E.”</strong><br><span class="reveal-text">Lidocaine-type drugs, Altered mental status, Tinnitus, ECG changes → lipid emulsion.</span></div>
+                    </div>
+                    <button onclick="openQuiz('mnemonics')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Final Exam</button>
+                </div>
+            </section>
+
+            <!-- FINAL EXAM SECTION -->
+            <section id="final_quiz_sec" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 text-center min-h-[60vh] flex flex-col justify-center items-center">
+                    <i class="fa-solid fa-graduation-cap text-8xl text-amber-500 mb-6"></i>
+                    <h2 class="text-4xl font-black text-slate-800 mb-4">Final 50‑Item Exam</h2>
+                    <p class="text-lg text-slate-600 mb-8 max-w-2xl">Covers systemic/regional/local/general anesthesia, complications, nursing care, and mnemonics. Score ≥75% to pass.</p>
+                    <button onclick="openQuiz('final_quiz')" class="w-full max-w-md bg-slate-800 text-white font-black py-4 rounded-xl shadow-md text-xl">Start Final Exam</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- QUIZ MODAL -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeQuiz()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <h2 id="quiz-title" class="text-3xl font-black text-slate-800 mb-2"></h2>
+            <div id="quiz-questions-container" class="space-y-4 mt-4"></div>
+            <button id="quiz-submit-btn" onclick="submitQuiz()" class="mt-8 w-full bg-obanes text-white font-bold py-4 rounded-xl shadow-lg">Submit Answers</button>
+            <div id="quiz-result-container" class="hidden mt-6 p-4 rounded-xl bg-slate-100"></div>
+        </div>
+    </div>
+
+    <script>
+        let unlockedSections = ['home'];
+        // QUIZZES (10 questions each)
+        const quizzes = {
+            overview: { title: "Overview & Principles", next: "systemic", questions: [
+                { q: "Which type of analgesia is most effective for labor pain?", options: ["Systemic opioids", "Epidural", "Pudendal block", "General anesthesia"], ans: 1 },
+                { q: "The primary goal of obstetric anesthesia is:", options: ["Maternal comfort, safety, minimal fetal depression", "Complete amnesia", "Rapid delivery", "Longer labor"], ans: 0 },
+                { q: "Most analgesic drugs cross the placenta and may cause:", options: ["Fetal tachycardia", "Fetal respiratory depression", "Increased fetal movement", "Polyhydramnios"], ans: 1 },
+                { q: "Which of the following should be avoided in pregnancy due to bleeding risk?", options: ["Acetaminophen", "Aspirin", "Fentanyl", "Lidocaine"], ans: 1 },
+                { q: "The ‘gold standard’ for pain relief in labor is:", options: ["Meperidine", "Epidural anesthesia", "Pudendal block", "Hypnosis"], ans: 1 },
+                { q: "Pre‑procedural IV fluid bolus for epidural is typically:", options: ["250 mL", "500-1000 mL LR", "1500 mL", "2000 mL"], ans: 1 },
+                { q: "Which anesthetic technique provides dense motor block for cesarean section?", options: ["Epidural only", "Spinal anesthesia", "Local infiltration", "Pudendal block"], ans: 1 },
+                { q: "Maternal position after regional anesthesia should include:", options: ["Supine", "Left uterine displacement (wedge)", "Trendelenburg", "Prone"], ans: 1 },
+                { q: "Opioids are relatively contraindicated in women with:", options: ["Asthma", "Respiratory compromise", "Obesity", "All of the above"], ans: 3 },
+                { q: "Informed consent for obstetric anesthesia should be obtained:", options: ["During active labor", "Before labor, or early in labor if possible", "After epidural placement", "Only from family"], ans: 1 }
+            ]},
+            systemic: { title: "Systemic Analgesia (Opioids)", next: "regional", questions: [
+                { q: "Common opioid used for labor analgesia is:", options: ["Meperidine (Demerol)", "Ketorolac", "Acetaminophen", "Dexamethasone"], ans: 0 },
+                { q: "Neonatal respiratory depression from opioids is best treated with:", options: ["Oxygen only", "Naloxone (Narcan)", "Intubation", "Bicarbonate"], ans: 1 },
+                { q: "To minimize neonatal depression, IV opioids should be given at least how long before delivery?", options: ["15 min", "1-3 hours", "6 hours", "12 hours"], ans: 1 },
+                { q: "Patient‑controlled analgesia (PCA) allows:", options: ["Nurse‑controlled dosing only", "Self‑administered demand doses with lockout", "Continuous infusion only", "Only oral opioids"], ans: 1 },
+                { q: "Which opioid is often used intrathecally (spinal) for labor?", options: ["Morphine", "Fentanyl", "Meperidine", "Codeine"], ans: 1 },
+                { q: "Butorphanol (Stadol) is a mixed agonist‑antagonist; it may cause:", options: ["Chest wall rigidity", "Sedation and nausea", "Maternal hypertension", "Uterine hypertonus"], ans: 1 },
+                { q: "Fetal heart rate pattern after maternal opioid administration may show:", options: ["Late decelerations", "Decreased variability", "Accelerations", "Tachycardia"], ans: 1 },
+                { q: "Which of the following is a side effect of systemic opioids in the mother?", options: ["Nausea, vomiting, pruritus", "Hypertension", "Diarrhea", "Polyuria"], ans: 0 },
+                { q: "The recommended route for rapid pain relief in active labor is:", options: ["IM", "IV", "PO", "Topical"], ans: 1 },
+                { q: "Naloxone for neonatal resuscitation is dosed at:", options: ["0.1 mg/kg", "0.01 mg/kg IV/IM", "1 mg/kg", "0.5 mg/kg"], ans: 1 }
+            ]},
+            regional: { title: "Regional Anesthesia (Epidural, Spinal)", next: "local", questions: [
+                { q: "The most common complication of epidural anesthesia is:", options: ["Post‑dural headache", "Hypotension", "Infection", "Nerve injury"], ans: 1 },
+                { q: "Spinal anesthesia provides onset of sensory block within:", options: ["30 sec-2 min", "5-10 min", "15-20 min", "30 min"], ans: 0 },
+                { q: "Epidural catheter is placed in which space?", options: ["Subarachnoid", "Epidural (extradural)", "Subdural", "Intrathecal"], ans: 1 },
+                { q: "Left uterine displacement during epidural placement is important to:", options: ["Prevent vena cava compression", "Improve fetal position", "Reduce spinal headache", "Increase anesthetic spread"], ans: 0 },
+                { q: "Post‑dural puncture headache (PDPH) is most common after:", options: ["Epidural", "Spinal anesthesia (accidental dural puncture)", "Pudendal block", "General anesthesia"], ans: 1 },
+                { q: "Which of the following is used to treat PDPH if conservative measures fail?", options: ["Epidural blood patch", "Acetaminophen", "IV antibiotics", "Spinal morphine"], ans: 0 },
+                { q: "Epidural opioid pruritus is best treated with:", options: ["Naloxone (low dose)", "Diphenhydramine", "Ondansetron", "Fentanyl"], ans: 0 },
+                { q: "Absolute contraindication to neuraxial block includes:", options: ["Patient request", "Coagulopathy (INR >1.5)", "Morbid obesity", "Preeclampsia"], ans: 1 },
+                { q: "Combined spinal‑epidural (CSE) provides:", options: ["Rapid onset of spinal with ability to extend via epidural", "Only spinal block", "Only epidural block", "General anesthesia"], ans: 0 },
+                { q: "After epidural placement, the nurse should assess the block level by testing:", options: ["Temperature sensation with ice", "Pain with pinprick", "Motor function (Bromage scale)", "All of the above"], ans: 3 }
+            ]},
+            local: { title: "Local & Pudendal Block", next: "general", questions: [
+                { q: "Pudendal block anesthetizes which area?", options: ["Uterus", "Perineum, vulva, lower vagina", "Abdomen", "Lower extremities"], ans: 1 },
+                { q: "Local anesthetic toxicity presents with:", options: ["Bradycardia, hypotension", "Perioral numbness, metallic taste, seizures", "Hypertension, headache", "Urinary retention"], ans: 1 },
+                { q: "Which local anesthetic is most commonly used for perineal infiltration?", options: ["Bupivacaine", "Lidocaine", "Ropivacaine", "Tetracaine"], ans: 1 },
+                { q: "The landmark for pudendal nerve block is:", options: ["Ischial spine", "Pubic symphysis", "Coccyx", "Sacral promontory"], ans: 0 },
+                { q: "Pudendal block does NOT relieve pain from:", options: ["Episiotomy", "Uterine contractions", "Laceration repair", "Vacuum placement"], ans: 1 },
+                { q: "Maximum dose of lidocaine with epinephrine is:", options: ["4.5 mg/kg", "7 mg/kg", "10 mg/kg", "15 mg/kg"], ans: 1 },
+                { q: "Treatment of local anesthetic systemic toxicity (LAST) includes:", options: ["IV lipid emulsion (Intralipid)", "Naloxone", "Flumazenil", "Protamine"], ans: 0 },
+                { q: "Pudendal block is typically performed during:", options: ["First stage", "Second stage (for delivery or operative)", "Third stage", "Postpartum"], ans: 1 },
+                { q: "Which of the following is an advantage of pudendal block?", options: ["No fetal depression", "No maternal hypotension", "Provides perineal anesthesia", "All of the above"], ans: 3 },
+                { q: "Potential complication of pudendal block includes:", options: ["Intravascular injection", "Retroperitoneal hematoma", "Infection", "All of the above"], ans: 3 }
+            ]},
+            general: { title: "General Anesthesia & Indications", next: "complications", questions: [
+                { q: "Which of the following is an indication for general anesthesia in obstetrics?", options: ["Patient preference", "Emergency cesarean (fetal distress, hemorrhage)", "Elective cesarean", "All of the above"], ans: 1 },
+                { q: "Aspiration of gastric contents during general anesthesia is called:", options: ["Mendelson’s syndrome", "ARDS", "Pneumothorax", "Malignant hyperthermia"], ans: 0 },
+                { q: "The most common cause of anesthesia‑related maternal death is:", options: ["Failed intubation", "Hemorrhage", "High spinal", "Hypotension"], ans: 0 },
+                { q: "Which induction agent is often used for rapid sequence induction in pregnancy?", options: ["Propofol", "Thiopental", "Ketamine", "All of the above"], ans: 3 },
+                { q: "Cricoid pressure during induction is applied to:", options: ["Prevent aspiration", "Facilitate intubation", "Reduce bleeding", "Improve ventilation"], ans: 0 },
+                { q: "Volatile anesthetics (sevoflurane) may cause:", options: ["Uterine atony", "Increased uterine tone", "Fetal tachycardia", "Maternal bradycardia"], ans: 0 },
+                { q: "Neonatal depression from general anesthesia is due to:", options: ["Cross‑placental transfer of drugs", "Maternal hypotension", "Uterine atony", "None"], ans: 0 },
+                { q: "Which muscle relaxant is used for rapid sequence induction?", options: ["Rocuronium", "Succinylcholine", "Vecuronium", "Cisatracurium"], ans: 1 },
+                { q: "Pre‑oxygenation before general anesthesia aims to:", options: ["Increase oxygen reserve", "Prevent aspiration", "Reduce fetal exposure", "Lower BP"], ans: 0 },
+                { q: "General anesthesia is the method of choice for cesarean section when:", options: ["Regional is contraindicated (coagulopathy, sepsis)", "Patient requests", "Trial of labor", "None"], ans: 0 }
+            ]},
+            complications: { title: "Complications & Nursing Care", next: "mnemonics", questions: [
+                { q: "First‑line treatment for epidural‑induced hypotension is:", options: ["Ephedrine IV", "Left lateral positioning and IV fluid", "Phenylephrine", "Atropine"], ans: 1 },
+                { q: "Post‑dural puncture headache is classically relieved by:", options: ["Sitting upright", "Lying flat and caffeine", "Standing", "Exercise"], ans: 1 },
+                { q: "High spinal anesthesia may cause:", options: ["Apnea, hypotension, bradycardia", "Hypertension, tachycardia", "Seizures", "Fever"], ans: 0 },
+                { q: "Urinary retention after epidural is managed by:", options: ["Indwelling catheter", "Intermittent catheterization", "Fluid restriction", "Both A and B"], ans: 3 },
+                { q: "Signs of local anesthetic toxicity include:", options: ["Tinnitus, metallic taste, seizure", "Hypertension, bradycardia", "Hypothermia", "Polyuria"], ans: 0 },
+                { q: "Epidural fever is often:", options: ["Sign of chorioamnionitis", "Non‑infectious hyperthermia (rule out infection)", "Due to drug allergy", "Expected"], ans: 1 },
+                { q: "Definitive treatment for severe PDPH is:", options: ["Epidural blood patch", "Acetaminophen", "Opioids", "Bed rest for weeks"], ans: 0 },
+                { q: "Nursing care after neuraxial block includes assessing:", options: ["Sensory level, motor block, vital signs", "Only pain score", "Only FHR", "Only contractions"], ans: 0 },
+                { q: "Ephedrine and phenylephrine are used to treat:", options: ["Hypotension", "Bradycardia", "Hypertension", "Pruritus"], ans: 0 },
+                { q: "Which of the following is a contraindication to neuraxial block?", options: ["Patient refusal", "Coagulopathy", "Infection at insertion site", "All of the above"], ans: 3 }
+            ]},
+            mnemonics: { title: "Mnemonics & Summary", next: "final_quiz_sec", questions: [
+                { q: "The mnemonic for regional types is:", options: ["E.S.P.", "F.O.R.M.", "L.A.T.E.", "C.S.E."], ans: 0 },
+                { q: "In E.S.P., 'E' stands for:", options: ["Epidural", "Ether", "Ephedrine", "Emergency"], ans: 0 },
+                { q: "The mnemonic for hypotension management is:", options: ["F.O.R.M.", "E.S.P.", "C.S.E.", "L.A.T.E."], ans: 0 },
+                { q: "In F.O.R.M., 'R' stands for:", options: ["Reposition (left tilt)", "Resuscitate", "Record", "Refer"], ans: 0 },
+                { q: "The mnemonic for local anesthetic toxicity is:", options: ["L.A.T.E.", "F.O.R.M.", "E.S.P.", "C.S.E."], ans: 0 },
+                { q: "In L.A.T.E., 'T' stands for:", options: ["Tinnitus", "Tachycardia", "Tachypnea", "Tetany"], ans: 0 },
+                { q: "Opioid reversal agent is:", options: ["Naloxone", "Flumazenil", "Naltrexone", "Nalorphine"], ans: 0 },
+                { q: "Which mnemonic helps recall epidural complications?", options: ["H.I.P.S.", "C.O.R.D.", "B.U.B.B.L.E.", "P.O.S.T."], ans: 0 },
+                { q: "CSE stands for:", options: ["Combined Spinal‑Epidural", "Cerebral Spinal Examination", "Cesarean Section Emergency", "None"], ans: 0 },
+                { q: "PDPH is treated with epidural blood patch. PDPH stands for:", options: ["Post‑dural puncture headache", "Post‑delivery pulmonary hypertension", "Pre‑eclampsia diastolic hypertension", "None"], ans: 0 }
+            ]}
+        };
+        // Build final 50-item exam
+        let finalQ = [];
+        for(let sec of ['overview','systemic','regional','local','general','complications','mnemonics']) {
+            finalQ.push(...quizzes[sec].questions.slice(0,7));
+        }
+        while(finalQ.length < 50) finalQ.push({ q: "The most effective method for pain relief during active labor is:", options: ["Epidural analgesia", "Systemic opioids", "Pudendal block", "General anesthesia"], ans: 0 });
+        quizzes.final_quiz = { title: "Final 50‑Item Exam: Operative Obstetric Analgesia/Anesthesia", next: null, questions: finalQ };
+
+        let currentQuiz = null;
+
+        function unlockFirstSection() { if(!unlockedSections.includes('overview')) { unlockedSections.push('overview'); updateSidebarUI(); } showSection('overview'); }
+        function showSection(sectionId) {
+            if (!unlockedSections.includes(sectionId) && sectionId !== 'home') { alert("Complete the Active Recall Quiz at the bottom of the previous section to unlock."); return; }
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(sectionId)?.classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-obanes-light','text-obanes-dark','border-r-4','border-obanes-dark'));
+            const activeBtn = document.getElementById('btn-'+sectionId);
+            if(activeBtn) activeBtn.classList.add('bg-obanes-light','text-obanes-dark','border-r-4','border-obanes-dark');
+            if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
+        }
+        function updateSidebarUI() {
+            const sections = ['home','overview','systemic','regional','local','general','complications','mnemonics','final_quiz_sec'];
+            sections.forEach(sec => {
+                const btn = document.getElementById('btn-'+sec);
+                if(!btn) return;
+                const lock = btn.querySelector('.fa-lock'), icon = btn.querySelector('.nav-icon');
+                if(unlockedSections.includes(sec) || sec==='home') { btn.classList.remove('locked-section'); if(lock) lock.classList.add('hidden'); if(icon) icon.classList.remove('hidden'); }
+                else { btn.classList.add('locked-section'); if(lock) lock.classList.remove('hidden'); if(icon) icon.classList.add('hidden'); }
+            });
+        }
+        function openQuiz(sectionId) { currentQuiz = sectionId; const qd = quizzes[sectionId]; if(!qd) return; document.getElementById('quiz-title').innerHTML = qd.title; const container = document.getElementById('quiz-questions-container'); container.innerHTML = ''; qd.questions.forEach((q, idx) => { let html = `<div class="bg-slate-50 p-4 rounded-xl mb-4"><p class="font-bold mb-3">${idx+1}. ${q.q}</p><div class="space-y-2">`; q.options.forEach((opt,oi) => { html += `<label class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white cursor-pointer"><input type="radio" name="q${idx}" value="${oi}" class="form-radio text-obanes"><span>${opt}</span></label>`; }); html += `</div><div class="feedback-${idx} text-sm mt-2 hidden"></div></div>`; container.innerHTML += html; }); document.getElementById('quiz-submit-btn').classList.remove('hidden'); document.getElementById('quiz-result-container').classList.add('hidden'); document.getElementById('quiz-modal').classList.remove('hidden'); }
+        function closeQuiz() { document.getElementById('quiz-modal').classList.add('hidden'); }
+        function submitQuiz() {
+            const qd = quizzes[currentQuiz];
+            if(!qd) return;
+            let score = 0;
+            for(let i=0; i<qd.questions.length; i++) {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                if(sel && parseInt(sel.value)===qd.questions[i].ans) score++;
+                const fbDiv = document.querySelector(`.feedback-${i}`);
+                if(fbDiv){
+                    fbDiv.classList.remove('hidden');
+                    const correctTxt = qd.questions[i].options[qd.questions[i].ans];
+                    if(sel && parseInt(sel.value)===qd.questions[i].ans) { fbDiv.innerHTML='<span class="text-green-700">✓ Correct</span>'; fbDiv.parentElement?.classList.add('quiz-feedback-correct'); }
+                    else { const selectedTxt = sel? qd.questions[i].options[parseInt(sel.value)]:"No answer"; fbDiv.innerHTML=`<span class="text-red-700">✗ Incorrect. Correct: ${correctTxt}. You answered: ${selectedTxt}</span>`; fbDiv.parentElement?.classList.add('quiz-feedback-wrong'); }
+                }
+            }
+            let percent = (score/qd.questions.length)*100;
+            let resultDiv = document.getElementById('quiz-result-container');
+            document.getElementById('quiz-submit-btn').classList.add('hidden');
+            resultDiv.classList.remove('hidden');
+            if(percent>=75){
+                if(currentQuiz==='final_quiz'){ resultDiv.innerHTML=`<div class="text-green-600 text-4xl text-center">🎉 Excellent! Score ${score}/${qd.questions.length} (${percent}%)<br>You mastered Obstetric Anesthesia</div><button onclick="closeQuiz()" class="mt-4 bg-obanes text-white px-6 py-2 rounded-xl">Close</button>`; return; }
+                if(quizzes[currentQuiz].next && !unlockedSections.includes(quizzes[currentQuiz].next)) unlockedSections.push(quizzes[currentQuiz].next);
+                if(quizzes[currentQuiz].next === 'mnemonics' && !unlockedSections.includes('final_quiz_sec')) unlockedSections.push('final_quiz_sec');
+                updateSidebarUI();
+                resultDiv.innerHTML=`<div class="text-green-600 text-3xl text-center">✅ Passed! (${score}/${qd.questions.length})</div><button onclick="closeQuiz(); showSection('${quizzes[currentQuiz].next}')" class="mt-4 bg-green-600 text-white px-6 py-2 rounded-xl">Unlock Next Section</button>`;
+            } else { resultDiv.innerHTML=`<div class="text-red-600 text-3xl text-center">❌ Failed: ${score}/${qd.questions.length} (${percent}%)<br>Need 75%</div><button onclick="openQuiz('${currentQuiz}')" class="mt-4 bg-slate-600 text-white px-6 py-2 rounded-xl">Try Again</button>`; }
+        }
+        function toggleRecallMode() { const active = !document.body.classList.contains('recall-mode'); const toggle=document.getElementById('recall-toggle'),knob=document.getElementById('recall-knob'); if(active){ document.body.classList.add('recall-mode'); toggle.classList.add('bg-obanes-dark'); knob.classList.add('translate-x-6'); } else { document.body.classList.remove('recall-mode'); toggle.classList.remove('bg-obanes-dark'); knob.classList.remove('translate-x-6'); } }
+        function toggleMobileMenu() { const s=document.getElementById('sidebar'); if(s.classList.contains('hidden')) s.classList.remove('hidden','flex','absolute','h-full','z-50'); else s.classList.add('hidden'); }
+        document.addEventListener('DOMContentLoaded', () => { updateSidebarUI(); document.querySelectorAll('.reveal-text').forEach(el => el.addEventListener('click', function(){ if(document.body.classList.contains('recall-mode')) this.classList.toggle('revealed'); })); });
+    </script>
+</body>
+</html>
